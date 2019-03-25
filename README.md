@@ -1,0 +1,2 @@
+# Regulus
+Neural networks project
