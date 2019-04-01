@@ -7,24 +7,29 @@ from sklearn.model_selection import train_test_split
 data = pd.read_csv('../csv/total.csv', index_col=0)
 print(data.shape)
 
-y = data.y
-X = data.x
+y = data.age_cluster
+X = data.drop('age_cluster', axis=1)
 
 # train-test-validation 8:1:1
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+
 X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=0.5, random_state=1)
 
 train = {}
-train['x'] = X_train
-train['y'] = y_train
+train['urls']        = X_train['urls']
+train['face_coords'] = X_train['face_coords']
+train['age_cluster'] = y_train
 
 test = {}
-test['x'] = X_test
-test['y'] = y_test
+test['urls']        = X_test['urls']
+test['face_coords'] = X_test['face_coords']
+test['age_cluster'] = y_test
 
 val = {}
-val['x'] = X_val
-val['y'] = y_val
+val['urls']        = X_val['urls']
+val['face_coords'] = X_val['face_coords']
+val['age_cluster'] = y_val
 
 df = pd.DataFrame(train, index=None)
 print("Train shape:", df.shape)
