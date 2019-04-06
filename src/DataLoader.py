@@ -3,6 +3,7 @@ import numpy as np
 from skimage import io, transform
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
+from PIL import Image
 
 
 class DataLoader(Dataset):
@@ -28,17 +29,19 @@ class DataLoader(Dataset):
     def __getitem__(self, idx):
         img_name = self.root_dir + self.meta.urls[idx]
         image = io.imread(img_name)
+        pic = Image.open(img_name)
         coords_str = self.meta.face_coords[idx]
         #coords has string type since saved as csv
         coords = [float(x) for x in coords_str[1:-1].split()]
         target = self.meta.age_cluster[idx]
-        sample = {'image': image, 'coords': coords}
+        #sample = {'pic': pic, 'image': image, 'coords': coords}
+        sample = image
       
         if self.transform:
             sample = self.transform(sample)
         else:
             to_tens = transforms.ToTensor()
-            sample['image'] = to_tens(sample['image'])
+            sample = to_tens(sample)
             
         if self.target_transform:
             target = self.target_transform(target)
