@@ -4,17 +4,19 @@ from skimage import io, transform
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 from PIL import Image
+import albumentations as alb
+from albumentations import pytorch
+import cv2
 
 
-class DataLoader(Dataset):
+class FaceDataSet(Dataset):
 
     def __init__(self, csv_file, root_dir, transform=None, target_transform=None):
         """
             csv_file (string): path to total.csv
             root_dir (string): path to directory with images
-                (empty if total.csv contains full path)
+                (empty str if total.csv contains full path)
             transform (callable, optional): optional transform to be applied to sample
-                (convert image to torch.Tensor by default)
             target_transform (callable, optional): optional transform to be applied to target
             
         """
@@ -28,22 +30,23 @@ class DataLoader(Dataset):
 
     def __getitem__(self, idx):
         img_name = self.root_dir + self.meta.urls[idx]
-        image = io.imread(img_name)
-        pic = Image.open(img_name)
-        coords_str = self.meta.face_coords[idx]
-        #coords has string type since saved as csv
-        coords = [float(x) for x in coords_str[1:-1].split()]
+        image_ = image = cv2.imread(img_name)
+        image_ = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         target = self.meta.age_cluster[idx]
-        #sample = {'pic': pic, 'image': image, 'coords': coords}
-        sample = image
-      
-        if self.transform:
-            sample = self.transform(sample)
-        else:
-            to_tens = transforms.ToTensor()
-            sample = to_tens(sample)
-            
+        
+        if (self.transform is None):
+            self.transform = alb.Compose([
+            alb.HorizontalFlip(),
+            alb.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=10, val_shift_limit=10, p=0.2),
+            alb.Blur(blur_limit=3, p=0.2),
+            alb.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.2),
+            alb.GaussNoise(p=0.1),
+            alb.pytorch.ToTensor()
+            ])
+        augmented = self.transform(image=image_)
+        image_ = augmented['image']
+        
         if self.target_transform:
             target = self.target_transform(target)
             
-        return (sample, target)
+        return (image_, target)
