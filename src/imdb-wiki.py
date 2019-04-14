@@ -117,14 +117,20 @@ def main():
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
-    train_loader = DataLoader(
-        '../csv/train.csv', # path to csv
-        '')                 # empty path to images, as csv contains full path
+    train_loader = torch.utils.data.DataLoader(
+        DataLoader(
+            '../csv/train.csv', # path to csv
+            ''                  # empty path to images, as csv contains full path
+        ),
+        num_workers=args.workers, pin_memory=True)
 
-    val_loader = DataLoader(
-        '../csv/validation.csv', # path to csv
-        '')                      # empty path to images, as csv contains full paths
-    
+    val_loader = torch.utils.data.DataLoader(
+        DataLoader(
+            '../csv/validation.csv', # path to csv
+            ''                       # empty path to images, as csv contains full path
+        ),
+        num_workers=args.workers, pin_memory=True)
+
     # create model
     if args.pretrained:
         print("=> using pre-trained model '{}'".format(args.arch))
@@ -217,12 +223,14 @@ def train(train_loader, model, criterion, optimizer, epoch, use_cuda):
     end = time.time()
 
     bar = Bar('Processing', max=len(train_loader))
+    print(' ', len(train_loader))
     for batch_idx, (inputs, targets) in enumerate(train_loader):
+        print(batch_idx, inputs, targets)
         # measure data loading time
         data_time.update(time.time() - end)
 
         if use_cuda:
-            inputs, targets = inputs.cuda(), targets.cuda(non_blockingl=True)
+            inputs, targets = inputs.cuda(), targets.cuda(non_blocking=True)
         inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
 
         # compute output
