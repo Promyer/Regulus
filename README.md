@@ -1,5 +1,7 @@
 # Regulus
-Neural networks project
+Neural networks project.
+
+Make the people older, then make the people younger
 
 # Usage
 `python generate_total_csv.py`
