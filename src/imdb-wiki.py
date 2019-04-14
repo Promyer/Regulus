@@ -16,9 +16,9 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 
 import models as customized_models
-import data_loader
+from data_loader import DataLoader 
 
-from utils import Bar, Logger, AverageMeter, accuracy, mkdir_p, savefig
+from utils import Bar, AverageMeter, accuracy, mkdir_p #  Logger, savefig 
 
 # Models
 default_model_names = sorted(name for name in models.__dict__
@@ -119,16 +119,12 @@ def main():
 
     train_loader = DataLoader(
         '../csv/train.csv', # path to csv
-        '',                 # empty path to images, as csv contains full paths
-        batch_size=args.train_batch, shuffle=True,
-        num_workers=args.workers, pin_memory=True)
+        '')                 # empty path to images, as csv contains full path
 
     val_loader = DataLoader(
         '../csv/validation.csv', # path to csv
-        '',                      # empty path to images, as csv contains full paths
-        batch_size=args.train_batch, shuffle=True,
-        num_workers=args.workers, pin_memory=True)
-
+        '')                      # empty path to images, as csv contains full paths
+    
     # create model
     if args.pretrained:
         print("=> using pre-trained model '{}'".format(args.arch))
@@ -144,9 +140,9 @@ def main():
 
     if args.arch.startswith('alexnet') or args.arch.startswith('vgg'):
         model.features = torch.nn.DataParallel(model.features)
-        model.cuda()
+        # model.cuda()
     else:
-        model = torch.nn.DataParallel(model).cuda()
+        model = torch.nn.DataParallel(model)   #.cuda()
 
     cudnn.benchmark = True
     print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
@@ -167,10 +163,10 @@ def main():
         start_epoch = checkpoint['epoch']
         model.load_state_dict(checkpoint['state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer'])
-        logger = Logger(os.path.join(args.checkpoint, 'log.txt'), title=title, resume=True)
-    else:
-        logger = Logger(os.path.join(args.checkpoint, 'log.txt'), title=title)
-        logger.set_names(['Learning Rate', 'Train Loss', 'Valid Loss', 'Train Acc.', 'Valid Acc.'])
+        # logger = Logger(os.path.join(args.checkpoint, 'log.txt'), title=title, resume=True)
+    # else:
+        # logger = Logger(os.path.join(args.checkpoint, 'log.txt'), title=title)
+        # logger.set_names(['Learning Rate', 'Train Loss', 'Valid Loss', 'Train Acc.', 'Valid Acc.'])
 
 
     if args.evaluate:
@@ -189,7 +185,7 @@ def main():
         test_loss, test_acc = test(val_loader, model, criterion, epoch, use_cuda)
 
         # append logger file
-        logger.append([state['lr'], train_loss, test_loss, train_acc, test_acc])
+        # logger.append([state['lr'], train_loss, test_loss, train_acc, test_acc])
 
         # save model
         is_best = test_acc > best_acc
@@ -202,8 +198,8 @@ def main():
                 'optimizer' : optimizer.state_dict(),
             }, is_best, checkpoint=args.checkpoint)
 
-    logger.close()
-    logger.plot()
+    # logger.close()
+    # logger.plot()
     savefig(os.path.join(args.checkpoint, 'log.eps'))
 
     print('Best acc:')
@@ -226,7 +222,7 @@ def train(train_loader, model, criterion, optimizer, epoch, use_cuda):
         data_time.update(time.time() - end)
 
         if use_cuda:
-            inputs, targets = inputs.cuda(), targets.cuda(non_blocking=True)
+            inputs, targets = inputs.cuda(), targets.cuda(non_blockingl=True)
         inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
 
         # compute output
