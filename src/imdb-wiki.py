@@ -16,7 +16,7 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 
 import models as customized_models
-from data_loader import DataLoader 
+from face_dataset import FaceDataset 
 
 from utils import Bar, AverageMeter, accuracy, mkdir_p #  Logger, savefig 
 
@@ -118,17 +118,19 @@ def main():
                                      std=[0.229, 0.224, 0.225])
 
     train_loader = torch.utils.data.DataLoader(
-        DataLoader(
+        FaceDataset(
             '../csv/train.csv', # path to csv
             ''                  # empty path to images, as csv contains full path
         ),
+        batch_size=args.train_batch, shuffle=True,
         num_workers=args.workers, pin_memory=True)
 
     val_loader = torch.utils.data.DataLoader(
-        DataLoader(
+        FaceDataset(
             '../csv/validation.csv', # path to csv
             ''                       # empty path to images, as csv contains full path
         ),
+        batch_size=args.test_batch, shuffle=False,
         num_workers=args.workers, pin_memory=True)
 
     # create model
