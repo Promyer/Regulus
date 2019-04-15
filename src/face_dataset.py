@@ -5,7 +5,7 @@ from albumentations import pytorch
 import cv2
 
 
-class FaceDataset(Dataset):
+class FaceDataSet(Dataset):
 
     def __init__(self, csv_file, root_dir, transform=None, target_transform=None):
         """
@@ -21,20 +21,18 @@ class FaceDataset(Dataset):
         self.transform = transform
         self.target_transform = target_transform
 
-        self.urls = list(self.meta.urls)
-        self.age_clusters = list(self.meta.age_cluster)
-
     def __len__(self):
         return self.meta.shape[0]
 
     def __getitem__(self, idx):
-        img_name = self.root_dir + self.urls[idx]
+        img_name = self.root_dir + self.meta.urls[idx]
         image_ = image = cv2.imread(img_name)
         image_ = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        target = self.age_clusters[idx]
+        target = self.meta.age_cluster[idx]
         
         if (self.transform is None):
             self.transform = alb.Compose([
+            alb.Resize(224, 224),
             alb.HorizontalFlip(),
             alb.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=10, val_shift_limit=10, p=0.2),
             alb.Blur(blur_limit=3, p=0.2),
