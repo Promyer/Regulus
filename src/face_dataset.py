@@ -20,15 +20,17 @@ class FaceDataSet(Dataset):
         self.root_dir = root_dir
         self.transform = transform
         self.target_transform = target_transform
+        self.urls = list(self.meta.urls)
+        self.age_clusters = list(self.meta.age_cluster)
 
     def __len__(self):
         return self.meta.shape[0]
 
     def __getitem__(self, idx):
-        img_name = self.root_dir + self.meta.urls[idx]
+        img_name = self.root_dir + self.urls[idx]        
         image_ = image = cv2.imread(img_name)
         image_ = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        target = self.meta.age_cluster[idx]
+        target = self.age_clusters[idx]    
         
         if (self.transform is None):
             self.transform = alb.Compose([
