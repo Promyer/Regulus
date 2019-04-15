@@ -1,9 +1,5 @@
 import pandas as pd
-import numpy as np
-from skimage import io, transform
 from torch.utils.data import Dataset
-import torchvision.transforms as transforms
-from PIL import Image
 import albumentations as alb
 from albumentations import pytorch
 import cv2
