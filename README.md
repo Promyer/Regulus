@@ -4,8 +4,8 @@ Neural networks project.
 Make the people older, then make the people younger
 
 # Usage
-`python generate_total_csv.py`
+* `python generate_total_csv.py` -- generate image urls, ages and clusters for imdb dataset
 
-`python split_into_train_test_validation.py`
+* `python align.py` -- faces centrizer
 
-`python imdb-wiki.py -a vgg16 --epochs 10 --schedule 81 122 --gamma 0.1 --checkpoint checkpoints/imdb-wiki/vgg16`
+* `python slpit_into_train_test` -- split images to correct file structure for CycleGan
