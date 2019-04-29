@@ -8,4 +8,4 @@ Make the people older, then make the people younger
 
 * `python align.py` -- faces centrizer
 
-* `python slpit_into_train_test` -- split images to correct file structure for CycleGan
+* `python generate_train_test.py` -- split images to correct file structure for CycleGan
