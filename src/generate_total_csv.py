@@ -6,16 +6,12 @@ from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
 
+rel_path = '../' # suppose that py file lies in ~/src/
 
-mat_arr = loadmat('../../data/imdb_crop/imdb.mat')['imdb']
-
-
-face_coords = mat_arr['face_location'][0][0][0]
-face_coords
-
+mat_arr = loadmat(rel_path + 'data/imdb_crop/imdb.mat')['imdb']
 
 urls = mat_arr['full_path'][0][0][0]
-urls = list(map(lambda url: '../data/imdb_crop/'+url[0], urls))
+urls = list(map(lambda url: rel_path+'data/imdb_crop/'+url[0], urls))
 
 photo_taken = mat_arr['photo_taken'][0][0][0]
 
@@ -43,7 +39,6 @@ for i, matlab_datenum in enumerate(dob):
     if (i % 10000) == 0:
          print("record", i+1, "processed, successfully parsed", len(year_to_subtr), 'years... ')
 
-
 urls = np.delete(urls,broken_idx)
 
 photo_taken = np.delete(photo_taken,broken_idx)
@@ -58,19 +53,14 @@ def age_to_clusters(age):
     return 2
 
 clusters = list(map(age_to_clusters, ages))
-clusters[:20]
-
-np.unique(clusters, return_counts=True)
 
 result = {}
 result['urls'] = urls
 result['age_clusters'] = clusters
 result['ages'] = ages
 
-
 df = pd.DataFrame(result, index=None)
 print(df.shape)
-df.head(20)
 
-with open('../../csv/total.csv', mode='w', encoding='utf-8') as f_csv:
+with open(rel_path+'csv/total.csv', mode='w', encoding='utf-8') as f_csv:
     df.to_csv(f_csv)
