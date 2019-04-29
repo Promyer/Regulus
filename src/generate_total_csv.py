@@ -6,9 +6,13 @@ from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
 
-mat_arr = loadmat('../data/imdb_crop/imdb.mat')['imdb']
+
+mat_arr = loadmat('../../data/imdb_crop/imdb.mat')['imdb']
+
 
 face_coords = mat_arr['face_location'][0][0][0]
+face_coords
+
 
 urls = mat_arr['full_path'][0][0][0]
 urls = list(map(lambda url: '../data/imdb_crop/'+url[0], urls))
@@ -34,12 +38,11 @@ for i, matlab_datenum in enumerate(dob):
             year += 1
         year_to_subtr.append(year)
     except:
+        print("broken matlab serial number:", i,  matlab_datenum)
         broken_idx.append(i)
     if (i % 10000) == 0:
          print("record", i+1, "processed, successfully parsed", len(year_to_subtr), 'years... ')
 
-face_coords = np.delete(face_coords,broken_idx)
-face_coords = list(map(lambda coords: coords[0], face_coords))
 
 urls = np.delete(urls,broken_idx)
 
@@ -48,25 +51,26 @@ photo_taken = np.delete(photo_taken,broken_idx)
 ages = list(map(lambda taken, yob: taken - yob, photo_taken, year_to_subtr))
 
 def age_to_clusters(age):
-    if age < 14:
+    if age < 25:
         return 0
-    if age < 26:
+    if age > 48:
         return 1
-    if age < 46:
-        return 2
-    if age < 66:
-        return 3
-    return 4
+    return 2
 
 clusters = list(map(age_to_clusters, ages))
+clusters[:20]
+
+np.unique(clusters, return_counts=True)
 
 result = {}
 result['urls'] = urls
-result['face_coords'] = face_coords
-result['age_cluster'] = clusters
+result['age_clusters'] = clusters
+result['ages'] = ages
+
 
 df = pd.DataFrame(result, index=None)
 print(df.shape)
+df.head(20)
 
-with open('../csv/total.csv', mode='w', encoding='utf-8') as f_csv:
+with open('../../csv/total.csv', mode='w', encoding='utf-8') as f_csv:
     df.to_csv(f_csv)
