@@ -52,7 +52,7 @@ class FaceAligner:
             ("jaw", (0, 17))
         ])        
         self.detector = dlib.get_frontal_face_detector()
-        self.predictor = dlib.shape_predictor('../notebooks/models/shape_predictor_68_face_landmarks.dat')
+        self.predictor = dlib.shape_predictor('models/shape_predictor_68_face_landmarks.dat')
         self.desiredLeftEye = desiredLeftEye
         self.desiredFaceWidth = desiredFaceWidth
         self.desiredFaceHeight = desiredFaceHeight
@@ -67,7 +67,7 @@ class FaceAligner:
         #    rects = [dlib.rectangle(face_loc[0], face_loc[3], face_loc[1], face_loc[2])]
         # loop over the face detections
         if (len(rects) == 0):
-            return None
+            return [0, None]
         rect = rects[0]
         try:
             # extract the ROI of the *original* face, then align the face
@@ -115,13 +115,10 @@ class FaceAligner:
             (w, h) = (self.desiredFaceWidth, self.desiredFaceHeight)
             output = cv2.warpAffine(image, M, (w, h),
                                     flags=cv2.INTER_CUBIC)
-            return output
+            return [1, output]
         except:
             pass
-        return None
-
-
-# In[ ]:
+        return [0, None]
 
 
 cam = cv2.VideoCapture(0)
@@ -130,13 +127,18 @@ cam = cv2.VideoCapture(0)
 #model.eval()
 FA = FaceAligner()
 cv2.namedWindow("test")
+img_counter = 1
+sss = None
 while True:
     ret, frame = cam.read()
-    image = FA.align(frame)
-    cv2.imshow("test", image)
+    cv2.imshow("test", frame)
     if not ret:
         break
     k = cv2.waitKey(1)
+    kl = FA.align(frame)
+    if(kl[0]):
+        sss = kl[1]
+        break
     if k%256 == 27:
         # ESC pressed
         print("Escape hit, closing...")
@@ -145,11 +147,15 @@ while True:
         # SPACE pressed
         img_name = "opencv_frame_{}.png".format(img_counter)
         cv2.imwrite(img_name, frame)
+        sss = kl
         print("{} written!".format(img_name))
         img_counter += 1
 cam.release()
 cv2.destroyAllWindows()
+cv2.imshow("aaaa.jpg", sss)
 
+k = cv2.waitKey()
+cv2.destroyAllWindows()
 
 # Да нормально морды детектятся, чего вы начинаете?
 # ![Мем2](images/wolf2.jpg)
