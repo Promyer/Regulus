@@ -1,11 +1,22 @@
 # Regulus
-Neural networks project.
+CycleGan для состаривания/омоложения людей по фотографии
 
-Make the people older, then make the people younger
+# Данные
 
-# Usage
-* `python generate_total_csv.py` -- generate image urls, ages and clusters for imdb dataset
+В качестве данных для обучения использовались фотографии знаменитостей из датасета
+[IMDB-WIKI](https://data.vision.ee.ethz.ch/cvl/rrothe/imdb-wiki/).
 
-* `python align.py` -- faces centrizer
+# Презентация
 
-* `python generate_train_test.py` -- split images to correct file structure for CycleGan
+not ready yet
+
+# Использование
+* `python generate_total_csv.py` -- сгенерировать информацию о фотографиях (путь к фотографии, возраст знаменитости)
+
+* `python align.py` -- отцентрировать и кропнуть лица на фотографиях
+
+* `python generate_train_test.py` -- разбить на train/test для CycleGan
+
+* [Обучить CycleGAN](https://github.com/aitorzip/PyTorch-CycleGAN)
+
+
